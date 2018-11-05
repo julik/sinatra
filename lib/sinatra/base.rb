@@ -879,9 +879,9 @@ module Sinatra
           end
         when Proc, String
           body = data.is_a?(String) ? Proc.new { data } : data
-          caller = settings.caller_locations.first
-          path = options[:path] || caller[0]
-          line = options[:line] || caller[1]
+          first_caller_location = settings.caller_locations.first
+          path = options[:path] || first_caller_location.path
+          line = options[:line] || first_caller_location.lineno
           template.new(path, line.to_i, options, &body)
         else
           raise ArgumentError, "Sorry, don't know how to render #{data.inspect}."
@@ -1508,11 +1508,7 @@ module Sinatra
         cleaned_caller(1).flatten
       end
 
-      # Like caller_files, but containing Arrays rather than strings with the
-      # first element being the file, and the second being the line.
-      def caller_locations
-        cleaned_caller 2
-      end
+      public :caller_locations
 
       private
 
